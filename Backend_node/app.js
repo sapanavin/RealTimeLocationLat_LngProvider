@@ -31,7 +31,7 @@ if (fs.existsSync(filePath)) {
     worksheet = workbook.Sheets[workbook.SheetNames[0]];
 } else {
     workbook = xlsx.utils.book_new();
-    worksheet = xlsx.utils.aoa_to_sheet([['Count', 'Timestamp','Latitude', 'Longitude']]);
+    worksheet = xlsx.utils.aoa_to_sheet([['Count','TimeStamp', 'Time','Latitude', 'Longitude']]);
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 }
 
@@ -41,11 +41,16 @@ var count= 0;
 app.post('/save-data', (req, res) => {
   // Initialize workbook and worksheet
 
-  var { timestamp,lat, lng } = req.body;
-  console.log("count, timestamp, lat, lng : ==> ",count++, timestamp, lat, lng );
+  var { timestamp, lat, lng } = req.body;
+  
+  const timestamp1 = new Date(timestamp);
+  const timeString = timestamp1.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+  //console.log(timeString);
+
+  console.log("count, timestamp, lat, lng : ==> ",count++, timestamp1, timeString , lat, lng );
     lat=String(lat);
     lng=String(lng);
-   xlsx.utils.sheet_add_aoa(worksheet, [[count, timestamp.toString(), lat.toString(), lng.toString()]], { origin: -1 });
+   xlsx.utils.sheet_add_aoa(worksheet, [[count, timestamp1, timeString, lat.toString(), lng.toString()]], { origin: -1 });
 
   // Write workbook to file
   xlsx.writeFile(workbook, 'data.xlsx');

@@ -5,21 +5,23 @@
 </head>
 <body>
     <h1>Real Time Lat Lng</h1>
-    <button id="myButton">Get Location</button>
+    <button id="myButton" onclick="getLocation()">getLocation 2 </button>
     
 
     <script>
-      var count = 1;
-        
-        var intervalId;
-
-        function getLocation() {
-            if (navigator.geolocation) {
+      var i=0;      
+      async function getLocation() {
+       // console.log(' getLocation ==> ', i++);
+                
+           
+          if (navigator.geolocation) {
+                
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const location = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
-                        timestamp: position.timestamp
+                        timestamp: position.timestamp, 
+                       
                     };
 
                     // Send latitude and longitude data to Node.js server
@@ -32,10 +34,10 @@
             }
         }
 
-        function sendLocationData(location) {
+        async function sendLocationData(location) {
 
-            console.log('from outside ==> ',count++);
-            fetch('http://localhost:3000/save-data', {   
+           //
+          await  fetch('http://localhost:3000/save-data', {   
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -45,10 +47,7 @@
             .then(response => {
                 if (response.ok) {
 
-                count++;                 
-                localStorage.setItem("count", count);
-   
-                    console.log('Data saved successfully ==> ', localStorage.getItem("count"));
+               // console.log('Data saved successfully ==> ',response);
                 } else {
                     console.error('Failed to save data');
                 }
@@ -59,13 +58,19 @@
         }
 
         // Start fetching location every second
-        intervalId = setInterval(getLocation, 1000);
+        
+       // intervalId = setInterval(getLocation, 1000);
 
         // Stop triggering getLocation after 10 seconds (for demonstration purposes)
-        setTimeout(function() {
-            clearInterval(intervalId);
-            console.log('Stopped fetching location.');
-        }, 10000);
+  
+            
+
+        var but = document.getElementById("myButton");
+        setInterval(function () {but.click();},1000 );
+        
+
+
+
     </script>
 </body>
 </html>
