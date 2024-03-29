@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real Time Lat Lng</title>
+</head>
+<body>
+    <h1>Real Time Lat Lng</h1>
+    <button id="myButton">Get Location</button>
+    
+
+    <script>
+      var count = 1;
+        
+        var intervalId;
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const location = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                        timestamp: position.timestamp
+                    };
+
+                    // Send latitude and longitude data to Node.js server
+                    sendLocationData(location);
+                }, function(error) {
+                    console.error('Error getting user location:', error);
+                });
+            } else {
+                console.log('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function sendLocationData(location) {
+
+            console.log('from outside ==> ',count++);
+            fetch('http://localhost:3000/save-data', {   
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(location)
+            })
+            .then(response => {
+                if (response.ok) {
+
+                count++;                 
+                localStorage.setItem("count", count);
+   
+                    console.log('Data saved successfully ==> ', localStorage.getItem("count"));
+                } else {
+                    console.error('Failed to save data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Start fetching location every second
+        intervalId = setInterval(getLocation, 1000);
+
+        // Stop triggering getLocation after 10 seconds (for demonstration purposes)
+        setTimeout(function() {
+            clearInterval(intervalId);
+            console.log('Stopped fetching location.');
+        }, 10000);
+    </script>
+</body>
+</html>
